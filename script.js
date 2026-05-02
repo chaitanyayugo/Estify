@@ -1,5 +1,7 @@
 let material_master = [];
 let price_sheet = [];
+window.estifyPlans = {};
+window.estifyCurrentPlan = null;
 
 // ================= LOAD =================
 async function loadData() {
@@ -25,6 +27,35 @@ function escapeHtml(v) {
 function formatValue(v) {
   const n = Number(v);
   return Number.isFinite(n) ? Math.round(n) : '—';
+}
+
+function formatPrecise(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n.toFixed(2) : '—';
+}
+
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert('Copied to clipboard ✅'))
+      .catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        alert('Copied to clipboard ✅');
+      });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    alert('Copied to clipboard ✅');
+  }
 }
 
 // ================= SMART CODE =================
@@ -78,7 +109,6 @@ function getGrade(code) {
 
 // ================= PRICE =================
 function getFinalPrice(model, config, grade) {
-
   if (config.includes("+")) {
     return config.split("+").reduce((sum, part) => {
       const item = price_sheet.find(p =>
@@ -101,6 +131,16 @@ function getFinalPrice(model, config, grade) {
   return Number(item.price);
 }
 
+// ================= GROUPING =================
+function groupByModel(results) {
+  const grouped = {};
+  for (const r of results) {
+    if (!grouped[r.model]) grouped[r.model] = [];
+    grouped[r.model].push(r);
+  }
+  return grouped;
+}
+
 // ================= MATH ENGINE =================
 function solveLinearSystem(A, b) {
   const n = A.length;
@@ -112,8 +152,9 @@ function solveLinearSystem(A, b) {
       if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot = r;
     }
 
-    if (Math.abs(M[pivot][col]) < 1e-12)
+    if (Math.abs(M[pivot][col]) < 1e-12) {
       throw new Error("Underdetermined system");
+    }
 
     [M[col], M[pivot]] = [M[pivot], M[col]];
 
@@ -147,20 +188,44 @@ function solveLeastSquares(X, y) {
     }
   }
 
+  // tiny stabilizer for near-singular systems
+  for (let i = 0; i < n; i++) XtX[i][i] += 1e-8;
+
   return solveLinearSystem(XtX, Xty);
 }
 
 // ================= ODOO ENGINE =================
 function generateOdooPricing(results, tolerance = 10) {
+  if (!results || results.length === 0) {
+    return null;
+  }
 
-  const colours = [...new Set(results.map(r => r.code))];
-  const configs = [...new Set(results.map(r => r.config))];
+  const colourCounts = {};
+  const configCounts = {};
+
+  for (const r of results) {
+    colourCounts[r.code] = (colourCounts[r.code] || 0) + 1;
+    configCounts[r.config] = (configCounts[r.config] || 0) + 1;
+  }
+
+  const colours = [...new Set(results.map(r => r.code))].sort((a, b) => {
+    const diff = (colourCounts[b] || 0) - (colourCounts[a] || 0);
+    return diff !== 0 ? diff : a.localeCompare(b);
+  });
+
+  const configs = [...new Set(results.map(r => r.config))].sort((a, b) => {
+    const diff = (configCounts[b] || 0) - (configCounts[a] || 0);
+    return diff !== 0 ? diff : a.localeCompare(b);
+  });
 
   const anchorColour = colours[0];
   const anchorConfig = configs[0];
 
-  const colourVars = colours.slice(1);
-  const configVars = configs.slice(1);
+  const colourVars = colours.filter(c => c !== anchorColour);
+  const configVars = configs.filter(k => k !== anchorConfig);
+
+  const colourIndex = new Map(colourVars.map((c, i) => [c, i]));
+  const configIndex = new Map(configVars.map((k, i) => [k, i]));
 
   const X = [];
   const y = [];
@@ -169,17 +234,40 @@ function generateOdooPricing(results, tolerance = 10) {
     const row = new Array(1 + colourVars.length + configVars.length).fill(0);
     row[0] = 1;
 
-    const cIndex = colourVars.indexOf(r.code);
-    if (cIndex !== -1) row[1 + cIndex] = 1;
+    if (r.code !== anchorColour && colourIndex.has(r.code)) {
+      row[1 + colourIndex.get(r.code)] = 1;
+    }
 
-    const kIndex = configVars.indexOf(r.config);
-    if (kIndex !== -1) row[1 + colourVars.length + kIndex] = 1;
+    if (r.config !== anchorConfig && configIndex.has(r.config)) {
+      row[1 + colourVars.length + configIndex.get(r.config)] = 1;
+    }
 
     X.push(row);
-    y.push(r.price);
+    y.push(Number(r.price));
   }
 
-  const beta = solveLeastSquares(X, y);
+  let beta;
+  try {
+    beta = solveLeastSquares(X, y);
+  } catch (err) {
+    return {
+      error: String(err),
+      basePrice: 0,
+      anchorColour,
+      anchorConfig,
+      colourExtras: {},
+      configExtras: {},
+      validation: results.map(r => ({
+        ...r,
+        predicted: null,
+        diff: null,
+        fits: false
+      })),
+      mismatchCount: results.length,
+      maxDiff: null,
+      tolerance
+    };
+  }
 
   const basePrice = beta[0];
 
@@ -199,7 +287,7 @@ function generateOdooPricing(results, tolerance = 10) {
       (colourExtras[r.code] || 0) +
       (configExtras[r.config] || 0);
 
-    const diff = predicted - r.price;
+    const diff = predicted - Number(r.price);
 
     return {
       ...r,
@@ -209,12 +297,73 @@ function generateOdooPricing(results, tolerance = 10) {
     };
   });
 
+  const mismatchCount = validation.filter(v => !v.fits).length;
+  const maxDiff = validation.length
+    ? Math.max(...validation.map(v => Math.abs(v.diff)))
+    : 0;
+
   return {
     basePrice,
+    anchorColour,
+    anchorConfig,
     colourExtras,
     configExtras,
-    validation
+    validation,
+    mismatchCount,
+    maxDiff,
+    tolerance
   };
+}
+
+function generateEstifyPlans(results, tolerance = 10) {
+  const grouped = groupByModel(results);
+  const plans = {};
+
+  for (const [model, rows] of Object.entries(grouped)) {
+    const plan = generateOdooPricing(rows, tolerance);
+    if (plan) plan.model = model;
+    plans[model] = plan;
+  }
+
+  return plans;
+}
+
+// ================= COPY HELPERS =================
+function buildPlanText(plan) {
+  if (!plan || plan.error) {
+    return plan?.error || 'No plan available';
+  }
+
+  const lines = [];
+  lines.push(`MODEL: ${plan.model}`);
+  lines.push(`BASE PRICE: ${formatValue(plan.basePrice)}`);
+  lines.push(`ANCHOR COLOUR: ${plan.anchorColour}`);
+  lines.push(`ANCHOR CONFIG: ${plan.anchorConfig}`);
+  lines.push('');
+  lines.push('COLOUR EXTRAS:');
+  Object.entries(plan.colourExtras).forEach(([k, v]) => {
+    lines.push(`${k} = ${formatValue(v)}`);
+  });
+  lines.push('');
+  lines.push('CONFIG EXTRAS:');
+  Object.entries(plan.configExtras).forEach(([k, v]) => {
+    lines.push(`${k} = ${formatValue(v)}`);
+  });
+
+  return lines.join('\n');
+}
+
+function copyOdooPlan(modelKey) {
+  const plan = window.estifyPlans?.[modelKey];
+  if (!plan) return;
+
+  copyText(buildPlanText(plan));
+}
+
+function copyMapEntries(obj) {
+  return Object.entries(obj || {})
+    .map(([k, v]) => `${k} : ${formatValue(v)}`)
+    .join('\n');
 }
 
 // ================= MAIN =================
@@ -225,7 +374,7 @@ async function runCalculator() {
     .split("\n")
     .filter(l => l.trim());
 
-  let results = [];
+  const results = [];
 
   for (let line of lines) {
     try {
@@ -234,41 +383,246 @@ async function runCalculator() {
       const price = getFinalPrice(parsed.model, parsed.config, grade);
 
       results.push({ ...parsed, grade, price });
-
     } catch (e) {
       console.error(line, e);
     }
   }
 
-  const plan = generateOdooPricing(results);
+  const plansByModel = generateEstifyPlans(results, 10);
+  window.estifyPlans = plansByModel;
 
-  displayResults(results, plan.basePrice);
-  displayOdoo(plan);
+  displayResults(results, plansByModel);
+  displayOdoo(plansByModel);
 }
 
 // ================= UI =================
-function displayResults(data, base) {
+function displayResults(data, plansByModel) {
   const tbody = document.querySelector("#output tbody");
+  if (!tbody) return;
+
   tbody.innerHTML = "";
 
   data.forEach(d => {
-    const extra = d.price - base;
+    const plan = plansByModel?.[d.model];
+    const base = plan && !plan.error ? Number(plan.basePrice) : null;
+    const extra = base === null ? null : Number(d.price) - base;
 
-    tbody.innerHTML += `
-      <tr>
-        <td>${d.model}</td>
-        <td>${d.code}</td>
-        <td>${d.grade}</td>
-        <td>${d.config}</td>
-        <td>${formatValue(d.price)}</td>
-        <td>${formatValue(extra)}</td>
-      </tr>
+    const validation = plan?.validation?.find(v =>
+      v.model === d.model &&
+      v.code === d.code &&
+      v.config === d.config
+    );
+
+    const tr = document.createElement("tr");
+
+    if (validation) {
+      tr.classList.add(validation.fits ? "fit-row" : "mismatch-row");
+    }
+
+    if (base !== null && Math.abs(Number(d.price) - base) < 0.000001) {
+      tr.classList.add("base-row");
+    }
+
+    tr.innerHTML = `
+      <td>${escapeHtml(d.model)}</td>
+      <td>${escapeHtml(d.code)}</td>
+      <td>${escapeHtml(d.grade)}</td>
+      <td>${escapeHtml(d.config)}</td>
+      <td>${formatValue(d.price)}</td>
+      <td>${formatValue(extra)}</td>
     `;
+
+    tbody.appendChild(tr);
   });
 }
 
-function displayOdoo(plan) {
-  console.log("BASE:", plan.basePrice);
-  console.log("COLOURS:", plan.colourExtras);
-  console.log("CONFIGS:", plan.configExtras);
+function renderRowsFromEntries(obj, type) {
+  const entries = Object.entries(obj || {});
+  if (!entries.length) {
+    return `<tr><td colspan="2">No ${type} extras found</td></tr>`;
+  }
+
+  return entries.map(([k, v]) => `
+    <tr>
+      <td>${escapeHtml(k)}</td>
+      <td class="${
+        Math.abs(Number(v)) < 0.000001
+          ? 'neutral'
+          : Number(v) > 0
+            ? 'positive'
+            : 'negative'
+      }">${formatValue(v)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderValidationRows(plan) {
+  if (!plan || plan.error) {
+    return `<tr><td colspan="6">${escapeHtml(plan?.error || 'No validation data')}</td></tr>`;
+  }
+
+  return plan.validation.map(v => `
+    <tr class="${v.fits ? 'fit-row' : 'mismatch-row'}">
+      <td>${escapeHtml(v.model)}</td>
+      <td>${escapeHtml(v.code)}</td>
+      <td>${escapeHtml(v.config)}</td>
+      <td>${formatPrecise(v.price)}</td>
+      <td>${formatPrecise(v.predicted)}</td>
+      <td class="${v.fits ? 'fit' : 'mismatch'}">
+        ${v.fits ? 'OK' : formatPrecise(v.diff)}
+      </td>
+    </tr>
+  `).join('');
+}
+
+function displayOdoo(plansByModel) {
+  const summary = document.getElementById("summary");
+  const odooBase = document.getElementById("odooBase");
+  const odooFit = document.getElementById("odooFit");
+
+  const colourBody = document.getElementById("colourOutputBody");
+  const configBody = document.getElementById("configOutputBody");
+  const validationBody = document.getElementById("validationOutputBody");
+
+  const models = Object.keys(plansByModel || {});
+
+  if (!models.length) {
+    if (summary) summary.textContent = "No valid rows found.";
+    if (odooBase) odooBase.textContent = "";
+    if (odooFit) odooFit.textContent = "";
+    if (colourBody) colourBody.innerHTML = "";
+    if (configBody) configBody.innerHTML = "";
+    if (validationBody) validationBody.innerHTML = "";
+    return;
+  }
+
+  const firstValidPlan = models
+    .map(m => plansByModel[m])
+    .find(p => p && !p.error) || plansByModel[models[0]];
+
+  if (summary) {
+    summary.textContent = `Solved ${models.length} model(s).`;
+  }
+
+  if (odooBase) {
+    odooBase.textContent = firstValidPlan && !firstValidPlan.error
+      ? `Solved base price: ${formatValue(firstValidPlan.basePrice)} | Anchor colour: ${firstValidPlan.anchorColour} | Anchor config: ${firstValidPlan.anchorConfig}`
+      : firstValidPlan?.error || "No solved base available.";
+  }
+
+  if (odooFit) {
+    if (firstValidPlan && !firstValidPlan.error) {
+      odooFit.textContent =
+        firstValidPlan.mismatchCount === 0
+          ? `All valid rows fit the Odoo attribute model within tolerance ±${firstValidPlan.tolerance}.`
+          : `${firstValidPlan.mismatchCount} row(s) exceed tolerance ±${firstValidPlan.tolerance}. Max diff: ${formatPrecise(firstValidPlan.maxDiff)}`;
+    } else {
+      odooFit.textContent = "No solved attribute values available.";
+    }
+  }
+
+  if (colourBody) {
+    colourBody.innerHTML = firstValidPlan && !firstValidPlan.error
+      ? renderRowsFromEntries(firstValidPlan.colourExtras, 'colour')
+      : `<tr><td colspan="2">${escapeHtml(firstValidPlan?.error || 'No colour extras')}</td></tr>`;
+  }
+
+  if (configBody) {
+    configBody.innerHTML = firstValidPlan && !firstValidPlan.error
+      ? renderRowsFromEntries(firstValidPlan.configExtras, 'configuration')
+      : `<tr><td colspan="2">${escapeHtml(firstValidPlan?.error || 'No configuration extras')}</td></tr>`;
+  }
+
+  if (validationBody) {
+    validationBody.innerHTML = renderValidationRows(firstValidPlan);
+  }
+
+  // Multi-model advanced cards
+  let host = document.getElementById("estifyPlans");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "estifyPlans";
+    host.style.marginTop = "24px";
+    document.body.appendChild(host);
+  }
+
+  host.innerHTML = models.map(modelKey => renderEstifyCard(modelKey, plansByModel[modelKey])).join('');
+}
+
+function renderEstifyCard(modelKey, plan) {
+  const title = escapeHtml(modelKey);
+
+  if (!plan || plan.error) {
+    return `
+      <section style="margin-top:20px;padding:16px;border-radius:14px;background:#020617;border:1px solid #334155;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h3 style="margin:0;color:#38bdf8;">${title}</h3>
+        </div>
+        <div style="margin-top:10px;color:#fca5a5;font-weight:600;">
+          ${escapeHtml(plan?.error || 'No plan available')}
+        </div>
+      </section>
+    `;
+  }
+
+  return `
+    <section style="margin-top:20px;padding:16px;border-radius:14px;background:#020617;border:1px solid #334155;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <h3 style="margin:0;color:#38bdf8;">${title}</h3>
+        <button onclick="copyOdooPlan(${JSON.stringify(modelKey)})">Copy Odoo Plan</button>
+      </div>
+
+      <div class="highlight" style="margin-top:12px;">
+        Base: <strong>${formatValue(plan.basePrice)}</strong>
+        &nbsp;|&nbsp; Anchor Colour: <strong>${escapeHtml(plan.anchorColour)}</strong>
+        &nbsp;|&nbsp; Anchor Config: <strong>${escapeHtml(plan.anchorConfig)}</strong>
+        &nbsp;|&nbsp; Status: <strong>${plan.mismatchCount === 0 ? 'Exact' : `Mismatch ${plan.mismatchCount}`}</strong>
+      </div>
+
+      <div class="grid" style="margin-top:16px;">
+        <div class="card">
+          <h3>Colour Extras</h3>
+          <table>
+            <thead>
+              <tr><th>Colour</th><th>Extra</th></tr>
+            </thead>
+            <tbody>
+              ${renderRowsFromEntries(plan.colourExtras, 'colour')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Configuration Extras</h3>
+          <table>
+            <thead>
+              <tr><th>Config</th><th>Extra</th></tr>
+            </thead>
+            <tbody>
+              ${renderRowsFromEntries(plan.configExtras, 'configuration')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h3>Validation</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Code</th>
+              <th>Config</th>
+              <th>Actual</th>
+              <th>Predicted</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${renderValidationRows(plan)}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
 }
