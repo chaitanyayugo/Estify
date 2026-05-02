@@ -2,244 +2,198 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Odoo Pricing Distributor</title>
-
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      margin: 0;
-      padding: 30px;
-      max-width: 1200px;
-      margin-inline: auto;
-    }
-
-    h1, h2 {
-      text-align: center;
-      color: #38bdf8;
-      margin-bottom: 10px;
-    }
-
-    section {
-      margin-top: 30px;
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-
-    textarea {
-      width: 100%;
-      height: 140px;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: #0f172a;
-      color: #e2e8f0;
-      outline: none;
-      resize: vertical;
-    }
-
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      background: linear-gradient(135deg, #38bdf8, #6366f1);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    table {
-      width: 100%;
-      margin-top: 15px;
-      border-collapse: collapse;
-      overflow: hidden;
-      border-radius: 10px;
-    }
-
-    th, td {
-      padding: 10px;
-      text-align: center;
-      font-size: 13px;
-    }
-
-    thead {
-      background: #334155;
-    }
-
-    tbody tr {
-      border-top: 1px solid #334155;
-    }
-
-    tbody tr:hover {
-      background: #273449;
-    }
-
-    .positive { color: #22c55e; }
-    .negative { color: #ef4444; }
-    .neutral  { color: #94a3b8; }
-
-    .fit {
-      color: #22c55e;
-      font-weight: bold;
-    }
-
-    .mismatch {
-      color: #ef4444;
-      font-weight: bold;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .card {
-      background: #0f172a;
-      padding: 15px;
-      border-radius: 10px;
-    }
-
-    .copy-btn {
-      margin-top: 10px;
-      font-size: 12px;
-      padding: 6px 10px;
-    }
-
-    .highlight {
-      background: #020617;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-      font-size: 13px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estify — Odoo Pricing Distributor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">E</div>
+        <div class="brand-copy">
+          <h1>Estify</h1>
+          <p>Elite pricing distributor for Odoo variant planning</p>
+        </div>
+      </div>
 
-<h1>Odoo Pricing Distributor</h1>
+      <div class="topbar-meta">
+        <div class="meta-chip">Base Solver</div>
+        <div class="meta-chip">Colour + Config</div>
+        <div class="meta-chip">Validation Engine</div>
+      </div>
+    </header>
 
-<!-- INPUT -->
-<section>
-  <h2>Variant Input</h2>
-  <textarea id="input" placeholder="Paste variants here..."></textarea>
-  <button onclick="runCalculator()">Run Pricing Engine</button>
-</section>
+    <main class="layout">
+      <section class="hero-card">
+        <div class="hero-copy">
+          <span class="eyebrow">Variant Pricing Intelligence</span>
+          <h2>Turn raw variant prices into Odoo-ready attribute values.</h2>
+          <p>
+            Paste your variants, solve the hidden base, distribute extras across colours and configurations,
+            then validate whether the dataset can be represented cleanly inside Odoo.
+          </p>
+        </div>
 
-<!-- RESULTS -->
-<section>
-  <h2>Variant Prices</h2>
-  <table id="output">
-    <thead>
-      <tr>
-        <th>Model</th>
-        <th>Code</th>
-        <th>Grade</th>
-        <th>Config</th>
-        <th>Price</th>
-        <th>Extra</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</section>
+        <div class="hero-actions">
+          <button class="primary-btn" onclick="runCalculator()">Run Pricing Engine</button>
+          <div class="hint">
+            Paste one variant per line. Estify will group by model automatically.
+          </div>
+        </div>
+      </section>
 
-<!-- ODOO DISTRIBUTION -->
-<section>
-  <h2>Odoo Attribute Pricing</h2>
+      <section class="panel-card input-card">
+        <div class="section-head">
+          <div>
+            <h3>Variant Input</h3>
+            <p>Paste product variants exactly as they appear in your sheet.</p>
+          </div>
+        </div>
 
-  <div id="baseInfo" class="highlight"></div>
+        <textarea
+          id="input"
+          class="input-area"
+          placeholder="Paste variants here...&#10;(DM) B5131-PR (BAILEY) (NW-521E FROST, 2.5S2UA)&#10;(DM) B5131-PR (BAILEY) (NW-516E LIGHT GREY, 1.25ER1U+1.25EL1U+1.25NA1V+STA-MUL11)"
+        ></textarea>
 
-  <div class="grid">
+        <div class="input-footer">
+          <div class="input-note">
+            Supports multi-line paste, multi-config rows, and model grouping.
+          </div>
+          <div class="input-note">
+            Solves base price mathematically — not by picking a variant blindly.
+          </div>
+        </div>
+      </section>
 
-    <!-- COLOUR -->
-    <div class="card">
-      <h3>Colour Extras</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Colour</th>
-            <th>Extra</th>
-          </tr>
-        </thead>
-        <tbody id="colourTable"></tbody>
-      </table>
+      <section class="panel-card summary-card">
+        <div class="section-head">
+          <div>
+            <h3>Solving Summary</h3>
+            <p>High-level outcome from the current run.</p>
+          </div>
+        </div>
 
-      <button class="copy-btn" onclick="copyTable('colourTable')">
-        Copy Colours
-      </button>
-    </div>
+        <div id="summary" class="summary-box">No results yet.</div>
+        <div id="odooBase" class="info-strip"></div>
+        <div id="odooFit" class="info-strip"></div>
+      </section>
 
-    <!-- CONFIG -->
-    <div class="card">
-      <h3>Configuration Extras</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Config</th>
-            <th>Extra</th>
-          </tr>
-        </thead>
-        <tbody id="configTable"></tbody>
-      </table>
+      <section class="panel-card results-card">
+        <div class="section-head">
+          <div>
+            <h3>Variant Prices</h3>
+            <p>Calculated final prices with base-relative extras.</p>
+          </div>
+        </div>
 
-      <button class="copy-btn" onclick="copyTable('configTable')">
-        Copy Configs
-      </button>
-    </div>
+        <div class="table-wrap">
+          <table id="output" class="data-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Code</th>
+                <th>Grade</th>
+                <th>Config</th>
+                <th>Price</th>
+                <th>Extra</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
 
+      <section class="panel-card odoo-card">
+        <div class="section-head">
+          <div>
+            <h3>Odoo Attribute Pricing</h3>
+            <p>Copy-ready extras for Odoo setup.</p>
+          </div>
+        </div>
+
+        <div class="odoo-grid">
+          <article class="mini-card">
+            <div class="mini-card-head">
+              <h4>Colour Extras</h4>
+              <p>Attribute values for colour / fabric codes.</p>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table compact">
+                <thead>
+                  <tr>
+                    <th>Colour</th>
+                    <th>Extra</th>
+                  </tr>
+                </thead>
+                <tbody id="colourOutputBody"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="mini-card">
+            <div class="mini-card-head">
+              <h4>Configuration Extras</h4>
+              <p>Attribute values for configuration combos.</p>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table compact">
+                <thead>
+                  <tr>
+                    <th>Config</th>
+                    <th>Extra</th>
+                  </tr>
+                </thead>
+                <tbody id="configOutputBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel-card validation-card">
+        <div class="section-head">
+          <div>
+            <h3>Validation Engine</h3>
+            <p>Shows whether each row fits the Odoo additive model within tolerance.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table validation-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Code</th>
+                <th>Config</th>
+                <th>Actual</th>
+                <th>Predicted</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="validationOutputBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="footer-card">
+        <div class="footer-copy">
+          <strong>Estify</strong> transforms pricing sheets into Odoo-ready attribute intelligence.
+        </div>
+        <div class="footer-subcopy">
+          Built for exact pricing, model grouping, and clean attribute distribution.
+        </div>
+      </section>
+    </main>
   </div>
-</section>
 
-<!-- VALIDATION -->
-<section>
-  <h2>Validation (CRITICAL)</h2>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Model</th>
-        <th>Code</th>
-        <th>Config</th>
-        <th>Actual</th>
-        <th>Predicted</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="validationTable"></tbody>
-  </table>
-
-</section>
-
-<script src="script.js"></script>
-
-<script>
-function copyTable(id) {
-  let text = "";
-  document.querySelectorAll(`#${id} tr`).forEach(tr => {
-    const tds = tr.querySelectorAll("td");
-    if (tds.length === 2) {
-      text += `${tds[0].innerText} : ${tds[1].innerText}\n`;
-    }
-  });
-
-  navigator.clipboard.writeText(text);
-  alert("Copied!");
-}
-</script>
-
+  <script src="./script.js"></script>
 </body>
 </html>
