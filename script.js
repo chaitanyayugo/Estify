@@ -1,5 +1,6 @@
 let material_master = [];
 let price_sheet = [];
+
 window.estifyPlans = {};
 window.estifyCurrentPlan = null;
 
@@ -34,28 +35,32 @@ function formatPrecise(v) {
   return Number.isFinite(n) ? n.toFixed(2) : '—';
 }
 
+function pickEl(...ids) {
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (el) return el;
+  }
+  return null;
+}
+
 function copyText(text) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text)
       .then(() => alert('Copied to clipboard ✅'))
-      .catch(() => {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        ta.remove();
-        alert('Copied to clipboard ✅');
-      });
+      .catch(() => fallbackCopy(text));
   } else {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    ta.remove();
-    alert('Copied to clipboard ✅');
+    fallbackCopy(text);
   }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  ta.remove();
+  alert('Copied to clipboard ✅');
 }
 
 // ================= SMART CODE =================
@@ -92,7 +97,6 @@ function parseVariant(input) {
   if (!fabricPart || !configPart) throw "Invalid fabric/config";
 
   const code = extractCode(fabricPart);
-
   configPart = configPart.trim().toUpperCase();
 
   return { model, code, config: configPart };
@@ -101,7 +105,7 @@ function parseVariant(input) {
 // ================= GRADE =================
 function getGrade(code) {
   const item = material_master.find(
-    m => m.code.toUpperCase() === code.toUpperCase()
+    m => m.code.trim().toUpperCase() === code.trim().toUpperCase()
   );
   if (!item) throw `Invalid Code: ${code}`;
   return item.grade;
@@ -112,9 +116,9 @@ function getFinalPrice(model, config, grade) {
   if (config.includes("+")) {
     return config.split("+").reduce((sum, part) => {
       const item = price_sheet.find(p =>
-        p.model === model &&
-        p.config.toUpperCase() === part.trim() &&
-        p.grade === grade
+        p.model.trim() === model.trim() &&
+        p.config.trim().toUpperCase() === part.trim() &&
+        p.grade.trim() === grade.trim()
       );
       if (!item) throw `Missing part price: ${part}`;
       return sum + Number(item.price);
@@ -122,9 +126,9 @@ function getFinalPrice(model, config, grade) {
   }
 
   const item = price_sheet.find(p =>
-    p.model === model &&
-    p.config.toUpperCase() === config &&
-    p.grade === grade
+    p.model.trim() === model.trim() &&
+    p.config.trim().toUpperCase() === config.trim() &&
+    p.grade.trim() === grade.trim()
   );
 
   if (!item) throw `Price not found: ${model} | ${config} | ${grade}`;
@@ -188,7 +192,6 @@ function solveLeastSquares(X, y) {
     }
   }
 
-  // tiny stabilizer for near-singular systems
   for (let i = 0; i < n; i++) XtX[i][i] += 1e-8;
 
   return solveLinearSystem(XtX, Xty);
@@ -198,6 +201,27 @@ function solveLeastSquares(X, y) {
 function generateOdooPricing(results, tolerance = 10) {
   if (!results || results.length === 0) {
     return null;
+  }
+
+  if (results.length === 1) {
+    const only = results[0];
+    return {
+      model: only.model,
+      basePrice: Number(only.price),
+      anchorColour: only.code,
+      anchorConfig: only.config,
+      colourExtras: { [only.code]: 0 },
+      configExtras: { [only.config]: 0 },
+      validation: [{
+        ...only,
+        predicted: Number(only.price),
+        diff: 0,
+        fits: true
+      }],
+      mismatchCount: 0,
+      maxDiff: 0,
+      tolerance
+    };
   }
 
   const colourCounts = {};
@@ -252,6 +276,7 @@ function generateOdooPricing(results, tolerance = 10) {
   } catch (err) {
     return {
       error: String(err),
+      model: results[0].model,
       basePrice: 0,
       anchorColour,
       anchorConfig,
@@ -303,6 +328,7 @@ function generateOdooPricing(results, tolerance = 10) {
     : 0;
 
   return {
+    model: results[0].model,
     basePrice,
     anchorColour,
     anchorConfig,
@@ -356,14 +382,7 @@ function buildPlanText(plan) {
 function copyOdooPlan(modelKey) {
   const plan = window.estifyPlans?.[modelKey];
   if (!plan) return;
-
   copyText(buildPlanText(plan));
-}
-
-function copyMapEntries(obj) {
-  return Object.entries(obj || {})
-    .map(([k, v]) => `${k} : ${formatValue(v)}`)
-    .join('\n');
 }
 
 // ================= MAIN =================
@@ -476,13 +495,13 @@ function renderValidationRows(plan) {
 }
 
 function displayOdoo(plansByModel) {
-  const summary = document.getElementById("summary");
-  const odooBase = document.getElementById("odooBase");
-  const odooFit = document.getElementById("odooFit");
+  const summary = pickEl("summary");
+  const odooBase = pickEl("odooBase", "baseInfo");
+  const odooFit = pickEl("odooFit");
 
-  const colourBody = document.getElementById("colourOutputBody");
-  const configBody = document.getElementById("configOutputBody");
-  const validationBody = document.getElementById("validationOutputBody");
+  const colourBody = pickEl("colourOutputBody", "colourTable");
+  const configBody = pickEl("configOutputBody", "configTable");
+  const validationBody = pickEl("validationOutputBody", "validationTable");
 
   const models = Object.keys(plansByModel || {});
 
@@ -493,6 +512,8 @@ function displayOdoo(plansByModel) {
     if (colourBody) colourBody.innerHTML = "";
     if (configBody) configBody.innerHTML = "";
     if (validationBody) validationBody.innerHTML = "";
+    const host = document.getElementById("estifyPlans");
+    if (host) host.innerHTML = "";
     return;
   }
 
@@ -537,7 +558,6 @@ function displayOdoo(plansByModel) {
     validationBody.innerHTML = renderValidationRows(firstValidPlan);
   }
 
-  // Multi-model advanced cards
   let host = document.getElementById("estifyPlans");
   if (!host) {
     host = document.createElement("div");
@@ -569,7 +589,7 @@ function renderEstifyCard(modelKey, plan) {
     <section style="margin-top:20px;padding:16px;border-radius:14px;background:#020617;border:1px solid #334155;">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
         <h3 style="margin:0;color:#38bdf8;">${title}</h3>
-        <button onclick="copyOdooPlan(${JSON.stringify(modelKey)})">Copy Odoo Plan</button>
+        <button onclick='copyOdooPlan(${JSON.stringify(modelKey)})'>Copy Odoo Plan</button>
       </div>
 
       <div class="highlight" style="margin-top:12px;">
@@ -626,3 +646,7 @@ function renderEstifyCard(modelKey, plan) {
     </section>
   `;
 }
+
+// Expose for HTML onclick
+window.runCalculator = runCalculator;
+window.copyOdooPlan = copyOdooPlan;
