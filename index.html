@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Odoo Pricing Distributor</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      margin: 0;
+      padding: 30px;
+      max-width: 1200px;
+      margin-inline: auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 10px;
+    }
+
+    section {
+      margin-top: 30px;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    textarea {
+      width: 100%;
+      height: 140px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #0f172a;
+      color: #e2e8f0;
+      outline: none;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 15px;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    thead {
+      background: #334155;
+    }
+
+    tbody tr {
+      border-top: 1px solid #334155;
+    }
+
+    tbody tr:hover {
+      background: #273449;
+    }
+
+    .positive { color: #22c55e; }
+    .negative { color: #ef4444; }
+    .neutral  { color: #94a3b8; }
+
+    .fit {
+      color: #22c55e;
+      font-weight: bold;
+    }
+
+    .mismatch {
+      color: #ef4444;
+      font-weight: bold;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: #0f172a;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .copy-btn {
+      margin-top: 10px;
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+
+    .highlight {
+      background: #020617;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Odoo Pricing Distributor</h1>
+
+<!-- INPUT -->
+<section>
+  <h2>Variant Input</h2>
+  <textarea id="input" placeholder="Paste variants here..."></textarea>
+  <button onclick="runCalculator()">Run Pricing Engine</button>
+</section>
+
+<!-- RESULTS -->
+<section>
+  <h2>Variant Prices</h2>
+  <table id="output">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Code</th>
+        <th>Grade</th>
+        <th>Config</th>
+        <th>Price</th>
+        <th>Extra</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<!-- ODOO DISTRIBUTION -->
+<section>
+  <h2>Odoo Attribute Pricing</h2>
+
+  <div id="baseInfo" class="highlight"></div>
+
+  <div class="grid">
+
+    <!-- COLOUR -->
+    <div class="card">
+      <h3>Colour Extras</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Colour</th>
+            <th>Extra</th>
+          </tr>
+        </thead>
+        <tbody id="colourTable"></tbody>
+      </table>
+
+      <button class="copy-btn" onclick="copyTable('colourTable')">
+        Copy Colours
+      </button>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="card">
+      <h3>Configuration Extras</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Config</th>
+            <th>Extra</th>
+          </tr>
+        </thead>
+        <tbody id="configTable"></tbody>
+      </table>
+
+      <button class="copy-btn" onclick="copyTable('configTable')">
+        Copy Configs
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- VALIDATION -->
+<section>
+  <h2>Validation (CRITICAL)</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Code</th>
+        <th>Config</th>
+        <th>Actual</th>
+        <th>Predicted</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="validationTable"></tbody>
+  </table>
+
+</section>
+
+<script src="script.js"></script>
+
+<script>
+function copyTable(id) {
+  let text = "";
+  document.querySelectorAll(`#${id} tr`).forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    if (tds.length === 2) {
+      text += `${tds[0].innerText} : ${tds[1].innerText}\n`;
+    }
+  });
+
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
+}
+</script>
+
+</body>
+</html>
