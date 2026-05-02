@@ -1,0 +1,672 @@
+[
+  {
+    "code": "FAB-BLT",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-BEY",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-AIS",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-HON",
+    "grade": "FAB4",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-QUE",
+    "grade": "FAB5",
+    "type": "fabric"
+  },
+  {
+    "code": "RFA-BMO",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "BV",
+    "grade": "FL1",
+    "type": "leather"
+  },
+  {
+    "code": "AN",
+    "grade": "FL2",
+    "type": "leather"
+  },
+  {
+    "code": "NC",
+    "grade": "FL3",
+    "type": "leather"
+  },
+  {
+    "code": "TO",
+    "grade": "FL4",
+    "type": "leather"
+  },
+  {
+    "code": "VO",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "NP",
+    "grade": "FL6",
+    "type": "leather"
+  },
+  {
+    "code": "NN",
+    "grade": "FL7",
+    "type": "leather"
+  },
+  {
+    "code": "RD",
+    "grade": "FL8",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-FRD",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-BLJ",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BIE",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-SCL",
+    "grade": "FAB4",
+    "type": "fabric"
+  },
+  {
+    "code": "SFA-BEM",
+    "grade": "FAB5",
+    "type": "fabric"
+  },
+  {
+    "code": "NW",
+    "grade": "FL2",
+    "type": "leather"
+  },
+  {
+    "code": "CA",
+    "grade": "FL3",
+    "type": "leather"
+  },
+  {
+    "code": "NE",
+    "grade": "FL4",
+    "type": "leather"
+  },
+  {
+    "code": "OH",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "SK",
+    "grade": "FL8",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-PAC",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-MAD",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-MEG",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-MTS",
+    "grade": "FAB5",
+    "type": "fabric"
+  },
+  {
+    "code": "BX",
+    "grade": "FL2",
+    "type": "leather"
+  },
+  {
+    "code": "BE",
+    "grade": "FL4",
+    "type": "leather"
+  },
+  {
+    "code": "TD",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "PE",
+    "grade": "FL8",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-HRO",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-TER",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-SKA",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "VS",
+    "grade": "FL2",
+    "type": "leather"
+  },
+  {
+    "code": "CG",
+    "grade": "FL4",
+    "type": "leather"
+  },
+  {
+    "code": "WD",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "HW",
+    "grade": "FL8",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-NDO",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-SUG",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BAC",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "AS",
+    "grade": "FL4",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-COE",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FABLIO",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-CLD",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BLN",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-MIL",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "SFA-PEY",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-CAN",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-VIS",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-MGA",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-CCA",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BLT-S",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-FRD-S",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BIE-S",
+    "grade": "FAB4",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-HNN",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-CRN",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-MOS",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-MHA",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-NTS",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-HUS",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "EFA-BBO",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "RY",
+    "grade": "FL4",
+    "type": "leather"
+  },
+  {
+    "code": "AV",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-LKV",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "TY",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-SNT",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-INN-T",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-LEX",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-NES-S",
+    "grade": "FAB4",
+    "type": "fabric"
+  },
+  {
+    "code": "RFA-LIF",
+    "grade": "FAB5",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-MMO",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-LSL",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-NES",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-MAK",
+    "grade": "FAB4",
+    "type": "fabric"
+  },
+  {
+    "code": "CS",
+    "grade": "FL2",
+    "type": "leather"
+  },
+  {
+    "code": "GO",
+    "grade": "FL3",
+    "type": "leather"
+  },
+  {
+    "code": "WT",
+    "grade": "FL4",
+    "type": "leather"
+  },
+  {
+    "code": "WH",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "MW",
+    "grade": "FL6",
+    "type": "leather"
+  },
+  {
+    "code": "IF",
+    "grade": "FL7",
+    "type": "leather"
+  },
+  {
+    "code": "RR",
+    "grade": "FL8",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-PNC",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-LSL-S",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "VK",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "PP",
+    "grade": "FL6",
+    "type": "leather"
+  },
+  {
+    "code": "SY",
+    "grade": "FL8",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-NEO",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-RAS",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "VY",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-VOG",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BXT",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-WLL",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "RFA-LIV",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-URB",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "CM",
+    "grade": "FL4",
+    "type": "leather"
+  },
+  {
+    "code": "VA",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "BFA-BNN",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-AMO",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-INN",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BRM",
+    "grade": "FAB4",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-ADE",
+    "grade": "FAB5",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BLD",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "BR",
+    "grade": "FL5",
+    "type": "leather"
+  },
+  {
+    "code": "FAB-MEO",
+    "grade": "FAB1",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-LIT",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-ORI",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-FSE",
+    "grade": "FAB4",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-FLF",
+    "grade": "FAB5",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BYN",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-CHL",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-TLT",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-MAK",
+    "grade": "FAB4",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-MVE",
+    "grade": "FAB5",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-KET",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-DEC",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-BAT",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-TEN",
+    "grade": "FAB4",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-PNO",
+    "grade": "FAB5",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-RIA",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-RHD",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "RFA-BDR",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-ABE",
+    "grade": "FAB5",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-CND",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-RIE",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-WIT",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "BFA-MER",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "FFA-CCD",
+    "grade": "FAB2",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-TRI",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-MMT",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-VIC",
+    "grade": "FAB3",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-SEW",
+    "grade": "FAB6",
+    "type": "fabric"
+  },
+  {
+    "code": "FAB-LOL",
+    "grade": "FAB3",
+    "type": "fabric"
+  }
+]
